@@ -1,0 +1,2083 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Балакин Константин — визитка</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    :root {
+      --accent: #b580ff;
+      --accent-bright: #d4a8ff;
+      --card-bg: rgba(10, 5, 20, 0.65);
+      --card-border: rgba(200, 150, 255, 0.25);
+      --text-main: #f0e6ff;
+      --text-dim: rgba(220, 200, 255, 0.85);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 30%, #1a0b2e, #000000);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      transition: background 0.8s ease;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== ФОНОВЫЕ СЛОИ ===== */
+    .bg-canvas-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+      transition: opacity 0.8s;
+    }
+
+    .bg-particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.4;
+      z-index: 0;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-120vh) scale(0.6); opacity: 0; }
+    }
+
+    /* Спец-эффект для «Закат» — тёплые лучи */
+    .sunset-rays {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(ellipse at 50% 100%, rgba(255, 120, 40, 0.12), transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(255, 60, 120, 0.08), transparent 50%);
+      transition: opacity 1s ease;
+    }
+
+    .sunset-rays.on { opacity: 1; }
+
+    /* Спец-эффект для «Матрица» — цифровой дождь */
+    .matrix-rain {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.2;
+      color: rgba(80, 255, 120, 0.15);
+      overflow: hidden;
+      transition: opacity 1s ease;
+      white-space: pre;
+    }
+
+    .matrix-rain.on { opacity: 1; }
+
+    /* Спец-эффект для «Неон» — пульсирующие кольца */
+    .neon-rings {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease;
+      overflow: hidden;
+    }
+
+    .neon-rings.on { opacity: 1; }
+
+    .neon-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(180, 100, 255, 0.2);
+      animation: neonRingExpand 8s ease-out infinite;
+    }
+
+    @keyframes neonRingExpand {
+      0% { transform: scale(0.3); opacity: 0; }
+      20% { opacity: 0.6; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* ===== КАРТОЧКА ===== */
+    .card {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 40px;
+      padding: 36px 24px 28px;
+      box-shadow: 0 0 40px rgba(180, 80, 255, 0.3), 0 0 80px rgba(100, 0, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+      border: 1px solid var(--card-border);
+      transition: box-shadow 0.6s ease, border-color 0.6s ease;
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(180, 128, 255, 0.06), transparent, rgba(180, 128, 255, 0.06), transparent);
+      animation: rotateGlow 18s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .card > * { position: relative; z-index: 1; }
+
+    /* ===== АВАТАР ===== */
+    .avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #7a3cff, #d47aff);
+      box-shadow: 0 0 30px rgba(180, 100, 255, 0.6), inset 0 0 20px rgba(255,255,255,0.2);
+      letter-spacing: -1px;
+      position: relative;
+      animation: avatarPulse 3s ease-in-out infinite;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .avatar:hover { transform: scale(1.08) rotate(-5deg); }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(200, 150, 255, 0.4);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes avatarPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(180, 100, 255, 0.6), inset 0 0 20px rgba(255,255,255,0.2); }
+      50% { transform: scale(1.04); box-shadow: 0 0 45px rgba(180, 100, 255, 0.9), inset 0 0 20px rgba(255,255,255,0.3); }
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 0; }
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 5.5vw, 2.5rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff, #d4b8ff, #b580ff, #ffffff);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .subtitle {
+      font-size: clamp(0.95rem, 3.5vw, 1.25rem);
+      color: rgba(220, 200, 255, 0.85);
+      font-weight: 400;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent-bright);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(140, 80, 240, 0.15);
+      border: 1px solid rgba(180, 130, 255, 0.3);
+      color: rgba(220, 200, 255, 0.85);
+      letter-spacing: 0.3px;
+      transition: all 0.25s;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .badge:hover {
+      background: rgba(180, 120, 255, 0.3);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 12px rgba(160, 100, 255, 0.3);
+    }
+
+    .theme-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .theme-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(200, 160, 255, 0.4);
+      color: #e0d0ff;
+      padding: 10px 18px;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      flex: 0 0 auto;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-btn .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .theme-btn[data-theme="neon"] .dot { background: #b580ff; box-shadow: 0 0 8px #b580ff; }
+    .theme-btn[data-theme="sunset"] .dot { background: #ff6b9d; box-shadow: 0 0 8px #ff6b9d; }
+    .theme-btn[data-theme="matrix"] .dot { background: #4dff88; box-shadow: 0 0 8px #4dff88; }
+
+    .theme-btn:hover {
+      background: rgba(200, 160, 255, 0.2);
+      border-color: rgba(220, 180, 255, 0.8);
+      transform: translateY(-2px);
+    }
+
+    .theme-btn:active { transform: scale(0.96); }
+
+    .theme-btn.active {
+      background: rgba(180, 120, 255, 0.35);
+      border-color: #c08aff;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(180, 120, 255, 0.5);
+    }
+
+    .secret-btn {
+      background: transparent;
+      border: 1.5px dashed rgba(200, 160, 255, 0.7);
+      color: #d9c6ff;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 4px;
+      margin-bottom: 4px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .secret-btn:hover {
+      border-color: #d0b0ff;
+      color: #ffffff;
+      background: rgba(160, 100, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .secret-btn .lock-icon {
+      transition: transform 0.4s;
+      display: inline-block;
+    }
+
+    .secret-btn.open .lock-icon { transform: rotate(20deg) scale(1.1); }
+
+    .secret-message {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease, margin 0.3s ease, padding 0.3s ease;
+      background: linear-gradient(135deg, rgba(120, 60, 220, 0.2), rgba(60, 20, 120, 0.15));
+      border-radius: 24px;
+      margin-top: 0;
+      padding: 0 18px;
+      color: #f0e6ff;
+      font-size: 1.05rem;
+      font-weight: 400;
+      border: 1px solid rgba(190, 140, 255, 0.3);
+      line-height: 1.5;
+    }
+
+    .secret-message.show {
+      max-height: 150px;
+      opacity: 1;
+      padding: 18px;
+      margin-top: 16px;
+    }
+
+    .secret-message .emoji {
+      font-size: 1.6rem;
+      display: inline-block;
+      margin-left: 6px;
+      animation: wiggle 0.6s infinite alternate;
+    }
+
+    @keyframes wiggle {
+      0% { transform: rotate(-5deg) scale(1); }
+      100% { transform: rotate(5deg) scale(1.1); }
+    }
+
+    .footer-note {
+      font-size: 0.78rem;
+      color: rgba(180, 160, 210, 0.55);
+      letter-spacing: 0.5px;
+      margin-top: 18px;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .footer-note .heart {
+      color: #ff6b9d;
+      animation: heartBeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.25); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.15); }
+    }
+
+    /* ===== СЕКЦИИ ===== */
+    .swipe-hint {
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      color: rgba(200, 170, 255, 0.5);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .swipe-hint::before,
+    .swipe-hint::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(160, 120, 255, 0.3), transparent);
+    }
+
+    .swipe-hint .arrow {
+      display: inline-block;
+      animation: bounceDown 1.6s ease-in-out infinite;
+    }
+
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+
+    .sim-container, .stars-container, .ampere-container {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(8, 4, 18, 0.72);
+      border-radius: 32px;
+      padding: 20px 16px 18px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(150, 100, 255, 0.25);
+      box-shadow: 0 0 30px rgba(100, 0, 200, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: box-shadow 0.4s, transform 0.3s, border-color 0.4s;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .sim-container:hover, .stars-container:hover, .ampere-container:hover {
+      box-shadow: 0 0 40px rgba(140, 60, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+      border-color: rgba(180, 130, 255, 0.4);
+    }
+
+    .stars-container { margin-top: 20px; }
+    .ampere-container { margin-top: 20px; }
+
+    .sim-title, .stars-title, .ampere-title {
+      color: rgba(220, 200, 255, 0.85);
+      font-size: 0.92rem;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      margin-bottom: 14px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sim-title .num, .stars-title .num, .ampere-title .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7a3cff, #b580ff);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(180, 100, 255, 0.5);
+    }
+
+    .canvas-wrapper, .stars-canvas-wrapper, .ampere-canvas-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: #050010;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(140, 80, 240, 0.2);
+      margin-bottom: 16px;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .stars-canvas-wrapper {
+      background: radial-gradient(circle at 50% 50%, #0a0520, #000005);
+      cursor: crosshair;
+    }
+
+    .ampere-canvas-wrapper {
+      background: radial-gradient(circle at 50% 50%, #0a0016, #000003);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #cbb8ff;
+      font-size: 0.88rem;
+    }
+
+    .slider-group label {
+      min-width: 100px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-group label .icon {
+      display: inline-flex;
+      width: 18px;
+      height: 18px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      font-size: 0.7rem;
+    }
+
+    .slider-group input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: rgba(120, 70, 200, 0.4);
+      border-radius: 10px;
+      outline: none;
+      transition: background 0.2s;
+    }
+
+    .slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #b580ff;
+      border: 2px solid #e0d0ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(160, 100, 255, 0.7);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .slider-group input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 18px rgba(180, 120, 255, 1);
+    }
+
+    .slider-group input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #b580ff;
+      border: 2px solid #e0d0ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(160, 100, 255, 0.7);
+    }
+
+    .slider-value {
+      min-width: 58px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #decaff;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    /* Переключатель режима (притяжение/отталкивание) */
+    .toggle-group {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(180, 130, 255, 0.35);
+      color: rgba(220, 200, 255, 0.75);
+      padding: 7px 16px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      user-select: none;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(160, 100, 255, 0.15);
+      border-color: rgba(200, 150, 255, 0.6);
+    }
+
+    .toggle-btn.active {
+      background: rgba(180, 120, 255, 0.35);
+      border-color: #c08aff;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(180, 120, 255, 0.45);
+    }
+
+    /* Тост */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 15, 60, 0.95);
+      color: #e8d8ff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(180, 130, 255, 0.5);
+      box-shadow: 0 8px 30px rgba(120, 60, 240, 0.4);
+      font-size: 0.88rem;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Конфетти */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 999;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Прогресс-бар скролла */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #7a3cff, #d47aff, #7a3cff);
+      background-size: 200% 100%;
+      animation: progressFlow 3s linear infinite;
+      z-index: 1001;
+      transition: width 0.1s;
+      box-shadow: 0 0 10px rgba(180, 120, 255, 0.8);
+    }
+
+    @keyframes progressFlow {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+
+    /* Кнопка «наверх» */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7a3cff, #b580ff);
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 20px rgba(140, 70, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 8px 28px rgba(160, 90, 255, 0.7);
+    }
+
+    /* Эмодзи-питомец */
+    .emoji-pet {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      font-size: 2rem;
+      cursor: pointer;
+      z-index: 999;
+      transition: transform 0.2s;
+      user-select: none;
+      animation: petFloat 4s ease-in-out infinite;
+      filter: drop-shadow(0 4px 8px rgba(140, 70, 255, 0.5));
+    }
+
+    .emoji-pet:hover { transform: scale(1.2) rotate(10deg); }
+
+    @keyframes petFloat {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-8px) rotate(5deg); }
+    }
+
+    .emoji-pet .pet-bubble {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(30, 15, 60, 0.95);
+      color: #e8d8ff;
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      border: 1px solid rgba(180, 130, 255, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 4px 16px rgba(120, 60, 240, 0.4);
+    }
+
+    .emoji-pet .pet-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-14px);
+    }
+
+    /* Адаптив */
+    @media (max-width: 480px) {
+      .card { padding: 26px 16px 20px; border-radius: 32px; }
+      .avatar { width: 64px; height: 64px; font-size: 1.6rem; }
+      .theme-btn { padding: 8px 13px; font-size: 0.82rem; }
+      .secret-btn { padding: 10px 22px; font-size: 0.9rem; }
+      .slider-group { flex-wrap: wrap; gap: 6px; }
+      .slider-group label { min-width: 70px; font-size: 0.82rem; }
+      .slider-value { min-width: 48px; font-size: 0.78rem; }
+      .emoji-pet { font-size: 1.6rem; bottom: 16px; left: 16px; }
+      .back-to-top { width: 40px; height: 40px; bottom: 16px; right: 16px; }
+    }
+
+    /* Переопределение цветов под тему */
+    body.theme-sunset { --text-main: #ffe8d6; }
+    body.theme-matrix { --text-main: #d4ffe0; }
+  </style>
+</head>
+<body>
+
+  <!-- Фоновые слои -->
+  <canvas class="bg-canvas-layer" id="bgCanvas"></canvas>
+  <div class="sunset-rays" id="sunsetRays"></div>
+  <div class="matrix-rain" id="matrixRain"></div>
+  <div class="neon-rings" id="neonRings"></div>
+
+  <!-- Прогресс скролла -->
+  <div class="scroll-progress" id="scrollProgress" style="width: 0%"></div>
+
+  <div class="card" id="mainCard">
+    <div class="avatar" id="avatarBtn" title="Нажми меня 👀">БК</div>
+    <h1>Привет, я Балакин Константин</h1>
+    <div class="subtitle" id="typedSubtitle">Начинающий вайб-кодер</div>
+    <div class="badges">
+      <span class="badge" data-tip="молекулы носятся как сумасшедшие">⚡ физика</span>
+      <span class="badge" data-tip="кинетическая теория">🧪 МКТ</span>
+      <span class="badge" data-tip="звёзды любят твой курсор">✨ интерактив</span>
+      <span class="badge" data-tip="честно-честно">🤖 сделано с ИИ</span>
+    </div>
+
+    <div class="theme-buttons">
+      <button class="theme-btn active" data-theme="neon"><span class="dot"></span>Неон</button>
+      <button class="theme-btn" data-theme="sunset"><span class="dot"></span>Закат</button>
+      <button class="theme-btn" data-theme="matrix"><span class="dot"></span>Матрица</button>
+    </div>
+
+    <button class="secret-btn" id="secretToggle">
+      <span class="lock-icon">🔒</span>
+      <span id="secretLabel">Показать секрет</span>
+    </button>
+    <div class="secret-message" id="secretMessage">
+      Я сделал этот сайт с помощью ИИ <span class="emoji">🤖</span>
+    </div>
+
+    <div class="footer-note">Сделано в 2026 году <span class="heart">♥</span></div>
+  </div>
+
+  <div class="swipe-hint"><span class="arrow">↓</span> свайп вниз · три мини-игры <span class="arrow">↓</span></div>
+
+  <div class="sim-container" id="simSection">
+    <div class="sim-title"><span class="num">1</span>Молекулярно-кинетическая теория · идеальный газ</div>
+    <div class="canvas-wrapper">
+      <canvas id="gasCanvas"></canvas>
+    </div>
+    <div class="controls">
+      <div class="slider-group">
+        <label><span class="icon">🌡️</span>Температура</label>
+        <input type="range" id="tempSlider" min="50" max="1000" value="300" step="1">
+        <span class="slider-value" id="tempValue">300 K</span>
+      </div>
+      <div class="slider-group">
+        <label><span class="icon">💨</span>Давление</label>
+        <input type="range" id="pressSlider" min="0.2" max="3.0" value="1.0" step="0.05">
+        <span class="slider-value" id="pressValue">1.00 атм</span>
+      </div>
+      <div class="slider-group">
+        <label><span class="icon">🔬</span>Концентрация</label>
+        <input type="range" id="concSlider" min="10" max="120" value="45" step="1">
+        <span class="slider-value" id="concValue">45 шт</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stars-container" id="starsSection">
+    <div class="stars-title"><span class="num">2</span>Звёздное поле · наведи курсор</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="attractBtn"><span>🧲</span>Притягивать</button>
+      <button class="toggle-btn" id="repelBtn"><span>💫</span>Отталкивать</button>
+    </div>
+    <div class="stars-canvas-wrapper" id="starsWrapper">
+      <canvas id="starsCanvas"></canvas>
+    </div>
+  </div>
+
+  <div class="ampere-container" id="ampereSection">
+    <div class="ampere-title"><span class="num">3</span>Закон Ампера · магнитное взаимодействие</div>
+    <div class="ampere-canvas-wrapper">
+      <canvas id="ampereCanvas"></canvas>
+    </div>
+    <div class="controls">
+      <div class="slider-group">
+        <label><span class="icon">🔵</span>Ток I₁</label>
+        <input type="range" id="current1Slider" min="-10" max="10" value="5" step="0.1">
+        <span class="slider-value" id="current1Value">+5.0 A</span>
+      </div>
+      <div class="slider-group">
+        <label><span class="icon">🟣</span>Ток I₂</label>
+        <input type="range" id="current2Slider" min="-10" max="10" value="5" step="0.1">
+        <span class="slider-value" id="current2Value">+5.0 A</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <button class="back-to-top" id="backToTop" title="Наверх">↑</button>
+  <div class="emoji-pet" id="emojiPet">
+    🐱
+    <div class="pet-bubble" id="petBubble">Мяу!</div>
+  </div>
+
+  <script>
+    // ==================== ТОСТЫ ====================
+    const toast = document.getElementById('toast');
+    let toastTimeout;
+    function showToast(msg, icon = '✨') {
+      clearTimeout(toastTimeout);
+      toast.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+      toast.classList.add('show');
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    // ==================== КОНФЕТТИ ====================
+    function spawnConfetti(count = 30, originX = null, originY = null) {
+      const colors = ['#b580ff', '#ff6b9d', '#4dff88', '#ffd93d', '#6bc5ff', '#ff8c42'];
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = (originX !== null ? originX : Math.random() * window.innerWidth) + 'px';
+        c.style.top = (originY !== null ? originY : -20) + 'px';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.width = (6 + Math.random() * 8) + 'px';
+        c.style.height = (6 + Math.random() * 8) + 'px';
+        const dur = 1.5 + Math.random() * 1.5;
+        c.style.animationDuration = dur + 's';
+        c.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), (dur + 0.5) * 1000);
+      }
+    }
+
+    // ==================== ФОНОВЫЕ ЧАСТИЦЫ ====================
+    (function spawnBgParticles() {
+      for (let i = 0; i < 22; i++) {
+        const p = document.createElement('div');
+        p.className = 'bg-particle';
+        const size = 2 + Math.random() * 4;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.background = `hsla(${260 + Math.random() * 60}, 100%, 70%, ${0.3 + Math.random() * 0.4})`;
+        p.style.boxShadow = `0 0 ${size * 3}px hsla(${260 + Math.random() * 60}, 100%, 70%, 0.6)`;
+        p.style.animationDuration = (12 + Math.random() * 18) + 's';
+        p.style.animationDelay = (-Math.random() * 20) + 's';
+        document.body.appendChild(p);
+      }
+    })();
+
+    // ==================== ФОНОВЫЙ CANVAS (живой фон) ====================
+    (function initBgCanvas() {
+      const bgCanvas = document.getElementById('bgCanvas');
+      const bctx = bgCanvas.getContext('2d');
+      let BW = 0, BH = 0;
+      let bgParticles = [];
+      let mouseBg = { x: -1000, y: -1000 };
+      let animId = null;
+
+      function resize() {
+        BW = window.innerWidth;
+        BH = window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        bgCanvas.width = BW * dpr;
+        bgCanvas.height = BH * dpr;
+        bgCanvas.style.width = BW + 'px';
+        bgCanvas.style.height = BH + 'px';
+        bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initParticles();
+      }
+
+      function initParticles() {
+        bgParticles = [];
+        const count = Math.floor((BW * BH) / 22000);
+        for (let i = 0; i < count; i++) {
+          bgParticles.push({
+            x: Math.random() * BW,
+            y: Math.random() * BH,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            r: 0.8 + Math.random() * 1.5,
+            hue: 260 + Math.random() * 80
+          });
+        }
+      }
+
+      function draw() {
+        bctx.clearRect(0, 0, BW, BH);
+
+        // Соединяем частицы линиями (созвездия)
+        for (let i = 0; i < bgParticles.length; i++) {
+          const a = bgParticles[i];
+          a.x += a.vx;
+          a.y += a.vy;
+          if (a.x < 0 || a.x > BW) a.vx *= -1;
+          if (a.y < 0 || a.y > BH) a.vy *= -1;
+
+          // Притяжение к курсору лёгкое
+          const mdx = mouseBg.x - a.x, mdy = mouseBg.y - a.y;
+          const mdist = Math.hypot(mdx, mdy);
+          if (mdist < 200 && mdist > 1) {
+            a.vx += (mdx / mdist) * 0.02;
+            a.vy += (mdy / mdist) * 0.02;
+          }
+          a.vx *= 0.99;
+          a.vy *= 0.99;
+
+          for (let j = i + 1; j < bgParticles.length; j++) {
+            const b = bgParticles[j];
+            const dx = b.x - a.x, dy = b.y - a.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 120) {
+              bctx.beginPath();
+              bctx.moveTo(a.x, a.y);
+              bctx.lineTo(b.x, b.y);
+              bctx.strokeStyle = `hsla(${a.hue}, 80%, 70%, ${(1 - d / 120) * 0.12})`;
+              bctx.lineWidth = 0.6;
+              bctx.stroke();
+            }
+          }
+
+          bctx.beginPath();
+          bctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          bctx.fillStyle = `hsla(${a.hue}, 90%, 75%, 0.5)`;
+          bctx.fill();
+        }
+        animId = requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        mouseBg.x = e.clientX;
+        mouseBg.y = e.clientY;
+      });
+
+      resize();
+      draw();
+      window.addEventListener('resize', resize);
+    })();
+
+    // ==================== ТЕМЫ + ЭФФЕКТЫ ====================
+    const body = document.body;
+    const card = document.getElementById('mainCard');
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const sunsetRays = document.getElementById('sunsetRays');
+    const matrixRain = document.getElementById('matrixRain');
+    const neonRings = document.getElementById('neonRings');
+
+    // Матричный дождь
+    function buildMatrixRain() {
+      const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF';
+      const cols = Math.floor(window.innerWidth / 16);
+      let rain = '';
+      for (let row = 0; row < 50; row++) {
+        for (let c = 0; c < cols; c++) {
+          rain += Math.random() < 0.6 ? chars[Math.floor(Math.random() * chars.length)] : ' ';
+        }
+        rain += '\n';
+      }
+      matrixRain.textContent = rain;
+    }
+
+    // Неоновые кольца
+    function buildNeonRings() {
+      neonRings.innerHTML = '';
+      for (let i = 0; i < 6; i++) {
+        const r = document.createElement('div');
+        r.className = 'neon-ring';
+        const size = 200 + Math.random() * 400;
+        r.style.width = size + 'px';
+        r.style.height = size + 'px';
+        r.style.left = (Math.random() * 100) + '%';
+        r.style.top = (Math.random() * 100) + '%';
+        r.style.animationDelay = (Math.random() * 8) + 's';
+        r.style.animationDuration = (6 + Math.random() * 6) + 's';
+        neonRings.appendChild(r);
+      }
+    }
+
+    buildMatrixRain();
+    buildNeonRings();
+    window.addEventListener('resize', () => { buildMatrixRain(); });
+
+    const themes = {
+      neon: {
+        bg: 'radial-gradient(circle at 20% 30%, #1a0b2e, #000000)',
+        glow: '0 0 40px rgba(180, 80, 255, 0.4), 0 0 80px rgba(100, 0, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
+        border: 'rgba(200, 150, 255, 0.3)',
+        accent: '#b580ff',
+        toast: ['Неон включён — сияем! 💜', 'Фиолетовая волна накрыла сайт 🌊', 'Неон: классика вайба ✨']
+      },
+      sunset: {
+        bg: 'radial-gradient(circle at 20% 30%, #2e0b1a, #0a0004)',
+        glow: '0 0 40px rgba(255, 80, 120, 0.4), 0 0 80px rgba(255, 120, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
+        border: 'rgba(255, 140, 160, 0.3)',
+        accent: '#ff6b9d',
+        toast: ['Закат: тёплые лучи 🌅', 'Оранжевый вайб активирован 🍊', 'Солнце садится, ток течёт 🌇']
+      },
+      matrix: {
+        bg: 'radial-gradient(circle at 20% 30%, #0a2e0a, #000800)',
+        glow: '0 0 40px rgba(80, 255, 120, 0.4), 0 0 80px rgba(0, 255, 80, 0.2), inset 0 1px 0 rgba(255,255,255,0.08)',
+        border: 'rgba(130, 255, 160, 0.3)',
+        accent: '#4dff88',
+        toast: ['Матрица загружена 🟢', 'Ты в матрице, Нео 🕶️', 'Зелёный код активирован 💚']
+      }
+    };
+
+    function applyTheme(name) {
+      const t = themes[name];
+      if (!t) return;
+      body.style.background = t.bg;
+      card.style.boxShadow = t.glow;
+      card.style.borderColor = t.border;
+      document.documentElement.style.setProperty('--accent', t.accent);
+      document.documentElement.style.setProperty('--accent-bright', t.accent);
+
+      // Спец-эффекты
+      sunsetRays.classList.toggle('on', name === 'sunset');
+      matrixRain.classList.toggle('on', name === 'matrix');
+      neonRings.classList.toggle('on', name === 'neon');
+
+      body.classList.remove('theme-neon', 'theme-sunset', 'theme-matrix');
+      body.classList.add('theme-' + name);
+    }
+
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        themeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const name = btn.dataset.theme;
+        applyTheme(name);
+        const msgs = themes[name].toast;
+        showToast(msgs[Math.floor(Math.random() * msgs.length)], '🎨');
+        if (name === 'matrix') spawnConfetti(20);
+        if (name === 'sunset') spawnConfetti(20);
+      });
+    });
+
+    // ==================== ПЕЧАТАЮЩИЙСЯ ТЕКСТ ====================
+    (function typeSubtitle() {
+      const el = document.getElementById('typedSubtitle');
+      const text = 'Начинающий вайб-кодер';
+      let i = 0;
+      el.textContent = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'typing-cursor';
+      el.appendChild(cursor);
+      function type() {
+        if (i < text.length) {
+          cursor.insertAdjacentText('beforebegin', text.charAt(i));
+          i++;
+          setTimeout(type, 70 + Math.random() * 40);
+        } else {
+          cursor.remove();
+        }
+      }
+      setTimeout(type, 400);
+    })();
+
+    // ==================== СЕКРЕТ ====================
+    const secretBtn = document.getElementById('secretToggle');
+    const secretMsg = document.getElementById('secretMessage');
+    const secretLabel = document.getElementById('secretLabel');
+    const lockIcon = secretBtn.querySelector('.lock-icon');
+    let secretVisible = false;
+
+    secretBtn.addEventListener('click', () => {
+      secretVisible = !secretVisible;
+      secretMsg.classList.toggle('show', secretVisible);
+      secretBtn.classList.toggle('open', secretVisible);
+      secretLabel.textContent = secretVisible ? 'Скрыть секрет' : 'Показать секрет';
+      lockIcon.textContent = secretVisible ? '🔓' : '🔒';
+      if (secretVisible) {
+        showToast('Секрет раскрыт!', '🤫');
+        spawnConfetti(25);
+      }
+    });
+
+    // ==================== ПАСХАЛКИ ====================
+    const avatarBtn = document.getElementById('avatarBtn');
+    const avatarPhrases = [
+      'Ты нашёл пасхалку! 🎉',
+      'Балакин одобряет 👌',
+      'Вайб-кодер в деле ⚡',
+      'Физика — это магия 🔮',
+      'ИИ передаёт привет 🤖',
+      'Ты кликнул — молодец!',
+      'Хочешь ещё? Кликай ещё 😏'
+    ];
+    let avatarClickCount = 0;
+    avatarBtn.addEventListener('click', (e) => {
+      const phrase = avatarPhrases[avatarClickCount % avatarPhrases.length];
+      avatarClickCount++;
+      showToast(phrase, '💫');
+      if (avatarClickCount === 7) {
+        showToast('Ты прошёл игру! 🏆', '🎊');
+        spawnConfetti(60, e.clientX, e.clientY);
+      }
+      if (avatarClickCount === 15) {
+        showToast('Вот это упорство! 🚀', '🌟');
+        spawnConfetti(80);
+      }
+    });
+
+    document.querySelectorAll('.badge').forEach(b => {
+      b.addEventListener('click', () => showToast(b.dataset.tip, '💡'));
+    });
+
+    // ==================== ЭМОДЗИ-ПИТОМЕЦ ====================
+    const pet = document.getElementById('emojiPet');
+    const petBubble = document.getElementById('petBubble');
+    const petEmojis = ['🐱', '🐶', '🦊', '🐼', '🐸', '🦄', '🐙', '👾'];
+    const petPhrases = [
+      'Мяу!', 'Гав!', 'Привет!', 'Ты классный!',
+      'Погладь меня 👋', 'Физика — топ!', 'Люблю вайбы ✨',
+      'Я слежу за тобой 👀', 'Ещё раз кликни!', 'Молекулы кружатся 🌀'
+    ];
+    let petIdx = 0;
+    pet.addEventListener('click', (e) => {
+      petIdx++;
+      pet.textContent = '';
+      const emoji = petEmojis[petIdx % petEmojis.length];
+      pet.appendChild(document.createTextNode(emoji));
+      const bubble = document.createElement('div');
+      bubble.className = 'pet-bubble';
+      bubble.id = 'petBubble';
+      bubble.textContent = petPhrases[Math.floor(Math.random() * petPhrases.length)];
+      pet.appendChild(bubble);
+      requestAnimationFrame(() => bubble.classList.add('show'));
+      setTimeout(() => bubble.remove(), 2000);
+      showToast(petPhrases[Math.floor(Math.random() * petPhrases.length)], emoji);
+      spawnConfetti(10, e.clientX, e.clientY);
+    });
+
+    // ==================== SCROLL PROGRESS + BACK TO TOP ====================
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      scrollProgress.style.width = pct + '%';
+
+      if (scrollTop > 500) backToTop.classList.add('visible');
+      else backToTop.classList.remove('visible');
+    });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ==================== МКТ ====================
+    (function initMKT() {
+      const canvas = document.getElementById('gasCanvas');
+      const ctx = canvas.getContext('2d');
+      const tempSlider = document.getElementById('tempSlider');
+      const pressSlider = document.getElementById('pressSlider');
+      const concSlider = document.getElementById('concSlider');
+      const tempValue = document.getElementById('tempValue');
+      const pressValue = document.getElementById('pressValue');
+      const concValue = document.getElementById('concValue');
+
+      let W = 0, H = 0;
+      let molecules = [];
+      let animationId = null;
+      let currentTemp = 300;
+      let currentPressure = 1.0;
+      let currentCount = 45;
+
+      const BASE_SPEED = 0.45;
+      const MIN_RADIUS = 4;
+      const MAX_RADIUS = 7;
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initMolecules();
+      }
+
+      function initMolecules() {
+        molecules = [];
+        for (let i = 0; i < currentCount; i++) {
+          const radius = MIN_RADIUS + Math.random() * (MAX_RADIUS - MIN_RADIUS);
+          molecules.push({
+            x: radius + Math.random() * (W - 2 * radius),
+            y: radius + Math.random() * (H - 2 * radius),
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            r: radius,
+            baseHue: 260 + Math.random() * 60
+          });
+        }
+      }
+
+      function syncCount() {
+        const target = currentCount;
+        if (molecules.length < target) {
+          while (molecules.length < target) {
+            const radius = MIN_RADIUS + Math.random() * (MAX_RADIUS - MIN_RADIUS);
+            molecules.push({
+              x: radius + Math.random() * (W - 2 * radius),
+              y: radius + Math.random() * (H - 2 * radius),
+              vx: (Math.random() - 0.5) * 2,
+              vy: (Math.random() - 0.5) * 2,
+              r: radius,
+              baseHue: 260 + Math.random() * 60
+            });
+          }
+        } else if (molecules.length > target) {
+          molecules.length = target;
+        }
+      }
+
+      function getSpeedFactor() { return Math.sqrt(currentTemp / 300); }
+      function getPressureFactor() { return 1.0 / Math.sqrt(currentPressure); }
+
+      function updateMolecules() {
+        const speedFactor = getSpeedFactor() * getPressureFactor();
+        const collisionBoost = 0.15 * currentPressure;
+
+        for (let i = 0; i < molecules.length; i++) {
+          const m = molecules[i];
+          const noise = 0.08 * speedFactor;
+          m.vx += (Math.random() - 0.5) * noise;
+          m.vy += (Math.random() - 0.5) * noise;
+
+          const maxSpeed = BASE_SPEED * speedFactor * 3.5;
+          const speed = Math.hypot(m.vx, m.vy);
+          if (speed > maxSpeed) {
+            m.vx = (m.vx / speed) * maxSpeed;
+            m.vy = (m.vy / speed) * maxSpeed;
+          }
+
+          if (Math.random() < collisionBoost * 0.1) {
+            const angle = Math.random() * Math.PI * 2;
+            const impulse = 0.5 * speedFactor;
+            m.vx += Math.cos(angle) * impulse;
+            m.vy += Math.sin(angle) * impulse;
+          }
+
+          m.x += m.vx * 0.6;
+          m.y += m.vy * 0.6;
+
+          if (m.x - m.r < 0) { m.x = m.r; m.vx = Math.abs(m.vx) * 0.98; }
+          else if (m.x + m.r > W) { m.x = W - m.r; m.vx = -Math.abs(m.vx) * 0.98; }
+          if (m.y - m.r < 0) { m.y = m.r; m.vy = Math.abs(m.vy) * 0.98; }
+          else if (m.y + m.r > H) { m.y = H - m.r; m.vy = -Math.abs(m.vy) * 0.98; }
+        }
+
+        for (let i = 0; i < molecules.length; i++) {
+          for (let j = i + 1; j < molecules.length; j++) {
+            const a = molecules[i], b = molecules[j];
+            const dx = b.x - a.x, dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = a.r + b.r;
+            if (dist < minDist && dist > 0.001) {
+              const nx = dx / dist, ny = dy / dist;
+              const overlap = minDist - dist;
+              a.x -= nx * overlap * 0.5;
+              a.y -= ny * overlap * 0.5;
+              b.x += nx * overlap * 0.5;
+              b.y += ny * overlap * 0.5;
+              const dvx = b.vx - a.vx, dvy = b.vy - a.vy;
+              const dot = dvx * nx + dvy * ny;
+              if (dot < 0) {
+                const impulse = 0.9 * dot;
+                a.vx += impulse * nx;
+                a.vy += impulse * ny;
+                b.vx -= impulse * nx;
+                b.vy -= impulse * ny;
+              }
+            }
+          }
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
+        grad.addColorStop(0, 'rgba(20, 5, 40, 0.5)');
+        grad.addColorStop(1, 'rgba(5, 0, 10, 0.9)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        const speedFactor = getSpeedFactor();
+
+        for (const m of molecules) {
+          const speed = Math.hypot(m.vx, m.vy);
+          const intensity = Math.min(1, speed / 2.5);
+          const hue = m.baseHue + (speedFactor - 1) * 30;
+          const lightness = 55 + intensity * 30;
+
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+          const glowGrad = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 2.5);
+          glowGrad.addColorStop(0, `hsla(${hue}, 100%, ${lightness}%, 0.9)`);
+          glowGrad.addColorStop(0.6, `hsla(${hue}, 90%, ${lightness}%, 0.3)`);
+          glowGrad.addColorStop(1, `hsla(${hue}, 90%, 50%, 0)`);
+          ctx.fillStyle = glowGrad;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.r * 0.85, 0, Math.PI * 2);
+          ctx.fillStyle = `hsl(${hue}, 90%, ${Math.min(85, lightness + 15)}%)`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(m.x - m.r * 0.25, m.y - m.r * 0.25, m.r * 0.3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+          ctx.fill();
+        }
+
+        ctx.font = '11px system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(200, 170, 255, 0.4)';
+        ctx.textAlign = 'left';
+        ctx.fillText(`T = ${currentTemp.toFixed(0)} K`, 12, H - 44);
+        ctx.fillText(`P = ${currentPressure.toFixed(2)} атм`, 12, H - 28);
+        ctx.fillText(`n = ${currentCount} шт`, 12, H - 12);
+        ctx.textAlign = 'right';
+        ctx.fillText('pV = nRT', W - 12, H - 12);
+      }
+
+      function animate() {
+        updateMolecules();
+        draw();
+        animationId = requestAnimationFrame(animate);
+      }
+
+      function updateTempDisplay() {
+        currentTemp = parseFloat(tempSlider.value);
+        tempValue.textContent = currentTemp.toFixed(0) + ' K';
+      }
+      function updatePressDisplay() {
+        currentPressure = parseFloat(pressSlider.value);
+        pressValue.textContent = currentPressure.toFixed(2) + ' атм';
+      }
+      function updateConcDisplay() {
+        const prev = currentCount;
+        currentCount = parseInt(concSlider.value, 10);
+        concValue.textContent = currentCount + ' шт';
+        if (molecules.length !== 0) syncCount();
+      }
+
+      tempSlider.addEventListener('input', updateTempDisplay);
+      pressSlider.addEventListener('input', updatePressDisplay);
+      concSlider.addEventListener('input', updateConcDisplay);
+
+      function start() {
+        resizeCanvas();
+        updateTempDisplay();
+        updatePressDisplay();
+        updateConcDisplay();
+        if (animationId) cancelAnimationFrame(animationId);
+        animate();
+      }
+
+      if (document.readyState === 'complete') start();
+      else window.addEventListener('load', start);
+      setTimeout(() => { if (W === 0 || H === 0) resizeCanvas(); }, 100);
+
+      window.__resizeGas = resizeCanvas;
+    })();
+
+    // ==================== ЗВЁЗДНОЕ ПОЛЕ ====================
+    (function initStarsField() {
+      const starsCanvas = document.getElementById('starsCanvas');
+      const starsWrapper = document.getElementById('starsWrapper');
+      const sctx = starsCanvas.getContext('2d');
+      const attractBtn = document.getElementById('attractBtn');
+      const repelBtn = document.getElementById('repelBtn');
+
+      let SW = 0, SH = 0;
+      let stars = [];
+      let mouse = { x: -1000, y: -1000, active: false };
+      let animationId = null;
+      let mode = 'attract'; // attract | repel
+
+      const STAR_COUNT = 90;
+      const STAR_MIN_R = 1.2;
+      const STAR_MAX_R = 3.5;
+      const ATTRACT_RADIUS = 180;
+      const ATTRACT_STRENGTH = 0.12;
+      const REPEL_STRENGTH = 0.18;
+      const ORBIT_STRENGTH = 0.06;
+      const FRICTION = 0.985;
+      const MAX_STAR_SPEED = 6;
+
+      attractBtn.addEventListener('click', () => {
+        mode = 'attract';
+        attractBtn.classList.add('active');
+        repelBtn.classList.remove('active');
+        showToast('Режим притяжения включён', '🧲');
+      });
+      repelBtn.addEventListener('click', () => {
+        mode = 'repel';
+        repelBtn.classList.add('active');
+        attractBtn.classList.remove('active');
+        showToast('Режим отталкивания включён', '💫');
+      });
+
+      function initCanvas() {
+        const rect = starsWrapper.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        SW = rect.width;
+        SH = rect.height;
+        starsCanvas.width = SW * dpr;
+        starsCanvas.height = SH * dpr;
+        starsCanvas.style.width = SW + 'px';
+        starsCanvas.style.height = SH + 'px';
+        sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        for (let i = 0; i < STAR_COUNT; i++) {
+          const r = STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R);
+          stars.push({
+            x: r + Math.random() * (SW - 2 * r),
+            y: r + Math.random() * (SH - 2 * r),
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            r: r,
+            hue: 220 + Math.random() * 100,
+            twinklePhase: Math.random() * Math.PI * 2,
+            twinkleSpeed: 0.02 + Math.random() * 0.03
+          });
+        }
+      }
+
+      function updateStars() {
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          if (mouse.active) {
+            const dx = mouse.x - s.x, dy = mouse.y - s.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < ATTRACT_RADIUS && dist > 0.5) {
+              const nx = dx / dist, ny = dy / dist;
+              if (mode === 'attract') {
+                const force = ATTRACT_STRENGTH * (1 - dist / ATTRACT_RADIUS);
+                s.vx += nx * force;
+                s.vy += ny * force;
+                const tangentX = -ny, tangentY = nx;
+                const orbitForce = ORBIT_STRENGTH * (1 - dist / ATTRACT_RADIUS);
+                s.vx += tangentX * orbitForce;
+                s.vy += tangentY * orbitForce;
+              } else {
+                // Отталкивание — сила больше при близком расстоянии
+                const force = REPEL_STRENGTH * (1 - dist / ATTRACT_RADIUS);
+                s.vx -= nx * force;
+                s.vy -= ny * force;
+              }
+            }
+          }
+          s.vx += (Math.random() - 0.5) * 0.06;
+          s.vy += (Math.random() - 0.5) * 0.06;
+          s.vx *= FRICTION;
+          s.vy *= FRICTION;
+          const speed = Math.hypot(s.vx, s.vy);
+          if (speed > MAX_STAR_SPEED) {
+            s.vx = (s.vx / speed) * MAX_STAR_SPEED;
+            s.vy = (s.vy / speed) * MAX_STAR_SPEED;
+          }
+          s.x += s.vx;
+          s.y += s.vy;
+          if (s.x - s.r < 0) { s.x = s.r; s.vx = Math.abs(s.vx) * 0.7; }
+          else if (s.x + s.r > SW) { s.x = SW - s.r; s.vx = -Math.abs(s.vx) * 0.7; }
+          if (s.y - s.r < 0) { s.y = s.r; s.vy = Math.abs(s.vy) * 0.7; }
+          else if (s.y + s.r > SH) { s.y = SH - s.r; s.vy = -Math.abs(s.vy) * 0.7; }
+          s.twinklePhase += s.twinkleSpeed;
+        }
+      }
+
+      function drawStars() {
+        sctx.clearRect(0, 0, SW, SH);
+        const bg = sctx.createRadialGradient(SW/2, SH/2, 0, SW/2, SH/2, Math.max(SW, SH) * 0.8);
+        bg.addColorStop(0, 'rgba(15, 8, 35, 0.9)');
+        bg.addColorStop(1, 'rgba(2, 0, 8, 1)');
+        sctx.fillStyle = bg;
+        sctx.fillRect(0, 0, SW, SH);
+
+        if (mouse.active) {
+          const mg = sctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, ATTRACT_RADIUS);
+          if (mode === 'attract') {
+            mg.addColorStop(0, 'rgba(180, 130, 255, 0.15)');
+            mg.addColorStop(0.5, 'rgba(140, 80, 255, 0.06)');
+            mg.addColorStop(1, 'rgba(100, 40, 200, 0)');
+          } else {
+            mg.addColorStop(0, 'rgba(255, 130, 100, 0.15)');
+            mg.addColorStop(0.5, 'rgba(255, 100, 80, 0.06)');
+            mg.addColorStop(1, 'rgba(200, 40, 100, 0)');
+          }
+          sctx.fillStyle = mg;
+          sctx.beginPath();
+          sctx.arc(mouse.x, mouse.y, ATTRACT_RADIUS, 0, Math.PI * 2);
+          sctx.fill();
+        }
+
+        for (const s of stars) {
+          const twinkle = 0.6 + 0.4 * Math.sin(s.twinklePhase);
+          const lightness = 65 + twinkle * 25;
+          const glow = sctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);
+          glow.addColorStop(0, `hsla(${s.hue}, 100%, ${lightness}%, ${0.5 * twinkle})`);
+          glow.addColorStop(0.4, `hsla(${s.hue}, 90%, 65%, ${0.15 * twinkle})`);
+          glow.addColorStop(1, `hsla(${s.hue}, 90%, 50%, 0)`);
+          sctx.fillStyle = glow;
+          sctx.beginPath();
+          sctx.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2);
+          sctx.fill();
+          sctx.beginPath();
+          sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          sctx.fillStyle = `hsl(${s.hue}, 100%, ${lightness}%)`;
+          sctx.fill();
+          sctx.beginPath();
+          sctx.arc(s.x - s.r * 0.25, s.y - s.r * 0.25, s.r * 0.4, 0, Math.PI * 2);
+          sctx.fillStyle = `rgba(255, 255, 255, ${0.7 * twinkle})`;
+          sctx.fill();
+        }
+      }
+
+      function animate() {
+        updateStars();
+        drawStars();
+        animationId = requestAnimationFrame(animate);
+      }
+
+      function start() {
+        initCanvas();
+        if (animationId) cancelAnimationFrame(animationId);
+        animate();
+      }
+
+      starsWrapper.addEventListener('mousemove', (e) => {
+        const rect = starsWrapper.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
+      });
+      starsWrapper.addEventListener('mouseleave', () => {
+        mouse.active = false;
+        mouse.x = -1000;
+        mouse.y = -1000;
+      });
+      starsWrapper.addEventListener('touchstart', (e) => {
+        const rect = starsWrapper.getBoundingClientRect();
+        const t = e.touches[0];
+        mouse.x = t.clientX - rect.left;
+        mouse.y = t.clientY - rect.top;
+        mouse.active = true;
+      }, { passive: true });
+      starsWrapper.addEventListener('touchmove', (e) => {
+        const rect = starsWrapper.getBoundingClientRect();
+        const t = e.touches[0];
+        mouse.x = t.clientX - rect.left;
+        mouse.y = t.clientY - rect.top;
+        mouse.active = true;
+      }, { passive: true });
+      starsWrapper.addEventListener('touchend', () => {
+        mouse.active = false;
+        mouse.x = -1000;
+        mouse.y = -1000;
+      });
+      starsWrapper.addEventListener('touchcancel', () => {
+        mouse.active = false;
+        mouse.x = -1000;
+        mouse.y = -1000;
+      });
+
+      if (document.readyState === 'complete') start();
+      else window.addEventListener('load', start);
+      setTimeout(() => { if (SW === 0 || SH === 0) initCanvas(); }, 100);
+
+      window.__resizeStars = initCanvas;
+    })();
+
+    // ==================== ЗАКОН АМПЕРА ====================
+    (function initAmpere() {
+      const canvas = document.getElementById('ampereCanvas');
+      const ctx = canvas.getContext('2d');
+      const s1 = document.getElementById('current1Slider');
+      const s2 = document.getElementById('current2Slider');
+      const v1 = document.getElementById('current1Value');
+      const v2 = document.getElementById('current2Value');
+
+      let W = 0, H = 0;
+      let I1 = 5, I2 = 5;
+      let animId = null;
+      let t = 0;
+
+      let wire1TopX, wire1BotX, wire2TopX, wire2BotX;
+      let wireY1, wireY2;
+
+      let offset = 0;
+      let targetOffset = 0;
+      let offsetVel = 0;
+
+      function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        wireY1 = H * 0.14;
+        wireY2 = H * 0.86;
+
+        wire1TopX = W * 0.32;
+        wire1BotX = W * 0.32;
+        wire2TopX = W * 0.68;
+        wire2BotX = W * 0.68;
+      }
+
+      function updateValues() {
+        I1 = parseFloat(s1.value);
+        I2 = parseFloat(s2.value);
+        v1.textContent = (I1 >= 0 ? '+' : '') + I1.toFixed(1) + ' A';
+        v2.textContent = (I2 >= 0 ? '+' : '') + I2.toFixed(1) + ' A';
+
+        const product = I1 * I2;
+        const magnitude = Math.abs(product);
+        const maxOffset = Math.min(W * 0.15, 60);
+
+        let sign = 0;
+        if (Math.abs(I1) > 0.05 && Math.abs(I2) > 0.05) {
+          sign = product > 0 ? -1 : 1;
+        }
+        const normalized = Math.min(1, magnitude / 100);
+        targetOffset = (product > 0 ? 1 : -1) * normalized * maxOffset;
+        if (Math.abs(I1) < 0.05 || Math.abs(I2) < 0.05) targetOffset = 0;
+      }
+
+      function drawFieldLines(wx, wy, current, hue) {
+        if (Math.abs(current) < 0.05) return;
+        const dir = current > 0 ? -1 : 1;
+        const strength = Math.abs(current);
+        const lineCount = 6;
+        const maxR = Math.min(W * 0.32, H * 0.42);
+
+        for (let k = 1; k <= lineCount; k++) {
+          const radius = (maxR / lineCount) * k;
+          const alpha = 0.08 + 0.14 * (1 - k / lineCount) * (strength / 10);
+          const squashY = 0.55;
+          const tilt = 0.18;
+
+          ctx.save();
+          ctx.translate(wx, wy);
+          ctx.rotate(tilt * dir);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, radius, radius * squashY, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = `hsla(${hue}, 100%, 70%, ${alpha * 0.7})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          const pointCount = 5;
+          const speed = 0.03 * strength * dir;
+          for (let p = 0; p < pointCount; p++) {
+            const angle = (p / pointCount) * Math.PI * 2 + t * speed + k * 0.4;
+            const px = Math.cos(angle) * radius;
+            const py = Math.sin(angle) * radius * squashY;
+            const glow = ctx.createRadialGradient(px, py, 0, px, py, 5);
+            glow.addColorStop(0, `hsla(${hue}, 100%, 85%, ${alpha * 2})`);
+            glow.addColorStop(1, `hsla(${hue}, 100%, 60%, 0)`);
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${hue}, 100%, 95%, ${alpha * 2.5})`;
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+      }
+
+      function drawWireFixed(topX, botX, y1, y2, current, hue, midShift, side) {
+        const midX = (topX + botX) / 2 + midShift;
+        const midY = (y1 + y2) / 2;
+        const c1x = topX + (midX - topX) * 0.5;
+        const c1y = y1 + (y2 - y1) * 0.25;
+        const c2x = botX + (midX - botX) * 0.5;
+        const c2y = y1 + (y2 - y1) * 0.75;
+
+        if (Math.abs(current) > 0.05) {
+          const intensity = Math.min(1, Math.abs(current) / 10);
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          for (let layer = 0; layer < 3; layer++) {
+            const spread = 8 + layer * 6;
+            const layerAlpha = (0.12 - layer * 0.03) * intensity;
+            ctx.beginPath();
+            ctx.moveTo(topX, y1);
+            ctx.bezierCurveTo(c1x, c1y, c2x, c2y, botX, y2);
+            ctx.lineWidth = spread * 2;
+            ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${layerAlpha})`;
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(topX, y1);
+        ctx.bezierCurveTo(c1x, c1y, c2x, c2y, botX, y2);
+
+        if (Math.abs(current) < 0.05) {
+          ctx.strokeStyle = 'rgba(100, 100, 130, 0.4)';
+          ctx.lineWidth = 4;
+        } else {
+          const intensity = Math.min(1, Math.abs(current) / 10);
+          const wireGrad = ctx.createLinearGradient(topX - 3, 0, topX + 3, 0);
+          wireGrad.addColorStop(0, `hsla(${hue}, 100%, 50%, ${0.6 + 0.4 * intensity})`);
+          wireGrad.addColorStop(0.5, `hsla(${hue}, 100%, 92%, ${0.85 + 0.15 * intensity})`);
+          wireGrad.addColorStop(1, `hsla(${hue}, 100%, 50%, ${0.6 + 0.4 * intensity})`);
+          ctx.strokeStyle = wireGrad;
+          ctx.lineWidth = 5;
+        }
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        if (Math.abs(current) > 0.05) {
+          const intensity = Math.min(1, Math.abs(current) / 10);
+          const pointCount = 7;
+          const dir = current > 0 ? -1 : 1;
+          const speed = 0.02 * Math.abs(current) * dir;
+
+          for (let p = 0; p < pointCount; p++) {
+            let param = ((p / pointCount) + t * speed) % 1;
+            if (param < 0) param += 1;
+            const tParam = dir < 0 ? (1 - param) : param;
+            const oneMinus = 1 - tParam;
+
+            const px = oneMinus*oneMinus*oneMinus*topX
+                     + 3*oneMinus*oneMinus*tParam*c1x
+                     + 3*oneMinus*tParam*tParam*c2x
+                     + tParam*tParam*tParam*botX;
+            const py = oneMinus*oneMinus*oneMinus*y1
+                     + 3*oneMinus*oneMinus*tParam*c1y
+                     + 3*oneMinus*tParam*tParam*c2y
+                     + tParam*tParam*tParam*y2;
+
+            const dotGrad = ctx.createRadialGradient(px, py, 0, px, py, 8);
+            dotGrad.addColorStop(0, `hsla(${hue}, 100%, 95%, ${0.9 * intensity})`);
+            dotGrad.addColorStop(0.5, `hsla(${hue}, 100%, 75%, ${0.4 * intensity})`);
+            dotGrad.addColorStop(1, `hsla(${hue}, 100%, 60%, 0)`);
+            ctx.fillStyle = dotGrad;
+            ctx.beginPath();
+            ctx.arc(px, py, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${hue}, 100%, 100%, ${intensity})`;
+            ctx.fill();
+          }
+
+          const arrowX = topX;
+          const arrowY = y1 + 12;
+          const arrowDir = current > 0 ? -1 : 1;
+          ctx.beginPath();
+          ctx.moveTo(arrowX, arrowY + arrowDir * 7);
+          ctx.lineTo(arrowX - 5, arrowY - arrowDir * 3);
+          ctx.lineTo(arrowX + 5, arrowY - arrowDir * 3);
+          ctx.closePath();
+          ctx.fillStyle = `hsla(${hue}, 100%, 85%, ${intensity})`;
+          ctx.fill();
+        }
+      }
+
+      function draw() {
+        const stiffness = 0.08;
+        const damping = 0.82;
+        const force = (targetOffset - offset) * stiffness;
+        offsetVel += force;
+        offsetVel *= damping;
+        offset += offsetVel;
+        t += 0.05;
+
+        ctx.clearRect(0, 0, W, H);
+
+        const bg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.8);
+        bg.addColorStop(0, 'rgba(15, 0, 30, 0.95)');
+        bg.addColorStop(1, 'rgba(0, 0, 5, 1)');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.strokeStyle = 'rgba(120, 80, 200, 0.05)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 30) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y < H; y += 30) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+
+        const hue1 = I1 >= 0 ? 210 : 25;
+        const hue2 = I2 >= 0 ? 210 : 25;
+
+        const mid1X = wire1TopX + offset;
+        const mid2X = wire2TopX - offset;
+
+        drawFieldLines(mid1X, (wireY1 + wireY2) / 2, I1, hue1);
+        drawFieldLines(mid2X, (wireY1 + wireY2) / 2, I2, hue2);
+
+        drawWireFixed(wire1TopX, wire1BotX, wireY1, wireY2, I1, hue1, offset, -1);
+        drawWireFixed(wire2TopX, wire2BotX, wireY1, wireY2, I2, hue2, -offset, 1);
+
+        function drawTerminal(x, y, hue) {
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, 30%, 40%, 0.9)`;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.strokeStyle = `hsla(${hue}, 60%, 70%, 0.7)`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, 80%, 85%, 0.9)`;
+          ctx.fill();
+        }
+        drawTerminal(wire1TopX, wireY1, hue1);
+        drawTerminal(wire1BotX, wireY2, hue1);
+        drawTerminal(wire2TopX, wireY1, hue2);
+        drawTerminal(wire2BotX, wireY2, hue2);
+
+        ctx.font = 'bold 12px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = `hsla(${hue1}, 100%, 80%, 0.9)`;
+        ctx.fillText(`I₁ = ${I1 >= 0 ? '+' : ''}${I1.toFixed(1)} A`, wire1TopX, wireY2 + 24);
+        ctx.fillStyle = `hsla(${hue2}, 100%, 80%, 0.9)`;
+        ctx.fillText(`I₂ = ${I2 >= 0 ? '+' : ''}${I2.toFixed(1)} A`, wire2TopX, wireY2 + 24);
+
+        const arrowY = wireY2 + 38;
+        function drawDirArrow(x, current, hue) {
+          if (Math.abs(current) < 0.05) return;
+          const dir = current > 0 ? -1 : 1;
+          const color = `hsla(${hue}, 100%, 80%, 0.85)`;
+          ctx.strokeStyle = color;
+          ctx.fillStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x, arrowY + dir * 5);
+          ctx.lineTo(x, arrowY - dir * 5);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x, arrowY - dir * 8);
+          ctx.lineTo(x - 4, arrowY - dir * 3);
+          ctx.lineTo(x + 4, arrowY - dir * 3);
+          ctx.closePath();
+          ctx.fill();
+        }
+        drawDirArrow(wire1TopX, I1, hue1);
+        drawDirArrow(wire2TopX, I2, hue2);
+
+        const product = I1 * I2;
+        let stateText = '', stateColor = '';
+        if (Math.abs(I1) < 0.05 || Math.abs(I2) < 0.05) {
+          stateText = '⚪ Нет тока — нет взаимодействия';
+          stateColor = 'rgba(150, 150, 170, 0.7)';
+        } else if (product > 0) {
+          stateText = '🟢 Притягиваются · токи сонаправлены';
+          stateColor = 'rgba(100, 230, 150, 0.95)';
+        } else {
+          stateText = '🔴 Отталкиваются · токи противонаправлены';
+          stateColor = 'rgba(255, 130, 100, 0.95)';
+        }
+
+        ctx.font = 'bold 11px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = stateColor;
+        ctx.fillText(stateText, W / 2, H - 10);
+
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(180, 160, 220, 0.4)';
+        ctx.fillText('F = μ₀·I₁·I₂·L / (2π·d)', 8, 16);
+        ctx.textAlign = 'right';
+        ctx.fillText('правило буравчика', W - 8, 16);
+      }
+
+      function animate() {
+        draw();
+        animId = requestAnimationFrame(animate);
+      }
+
+      s1.addEventListener('input', updateValues);
+      s2.addEventListener('input', updateValues);
+
+      let lastProduct = 0;
+      setInterval(() => {
+        const product = I1 * I2;
+        if (Math.abs(I1) > 0.1 && Math.abs(I2) > 0.1) {
+          if (lastProduct <= 0 && product > 0) {
+            showToast('Токи сонаправлены → притяжение!', '🧲');
+          } else if (lastProduct >= 0 && product < 0) {
+            showToast('Токи противонаправлены → отталкивание!', '💥');
+          }
+          lastProduct = product;
+        }
+      }, 400);
+
+      function start() {
+        resizeCanvas();
+        updateValues();
+        if (animId) cancelAnimationFrame(animId);
+        animate();
+      }
+
+      if (document.readyState === 'complete') start();
+      else window.addEventListener('load', start);
+      setTimeout(() => { if (W === 0 || H === 0) resizeCanvas(); }, 100);
+
+      window.__resizeAmpere = resizeCanvas;
+    })();
+
+    // ==================== РЕСАЙЗ ====================
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (window.__resizeGas) window.__resizeGas();
+        if (window.__resizeStars) window.__resizeStars();
+        if (window.__resizeAmpere) window.__resizeAmpere();
+      }, 150);
+    });
+
+    // ==================== ПРИВЕТСТВИЕ ====================
+    setTimeout(() => {
+      showToast('Добро пожаловать! Полистай вниз 👇', '👋');
+    }, 1200);
+
+    // ==================== КОНФЕТТИ ПРИ СКРОЛЛЕ ДО КОНЦА ====================
+    let confettiFired = false;
+    window.addEventListener('scroll', () => {
+      if (confettiFired) return;
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+        confettiFired = true;
+        spawnConfetti(50);
+        showToast('Ты дошёл до конца! Держи конфетти 🎉', '🎊');
+      }
+    });
+
+    // Применяем стартовую тему
+    applyTheme('neon');
+  </script>
+</body>
+</html>
+```
